@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head><title>Edit Member</title></head>
+<body>
+    <h1>Edit Member</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <label>Name:</label><br>
+        <input type="text" name="name" value="{{ member.name }}" required><br><br>
+        <label>Email:</label><br>
+        <input type="email" name="email" value="{{ member.email }}" required><br><br>
+        <label>Is available:</label><br>
+        <input type="checkbox" name="is_active" {% if member.is_active %}checked{% endif %}><br><br>
+        <button type="submit">Save Changes</button>
+    </form>
+</body>
+</html>
