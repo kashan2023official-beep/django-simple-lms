@@ -1,96 +1,96 @@
-# Django Library Management System
+# Django Simple LMS (Library Management System)
 
-A simple Library Management System built with Django, allowing staff to manage books, members, and borrow records — with automatic email notifications sent to members when they borrow a book.
+A web-based Library Management System built with Django, using server-rendered templates styled with Tailwind CSS. Supports full CRUD for books and members, a borrow/return workflow with automatic copy tracking, and email confirmation on borrow.
 
 ## Features
 
-- **Book Management** — Add, edit, delete, and list books (title, author, ISBN, total/available copies)
-- **Member Management** — Add, edit, delete, and list members
-- **Borrow Records** — Track which member borrowed which book, borrow date, due date, and return status
-- **Email Notifications** — When a member borrows a book, an automatic confirmation email is sent to their registered email address (via Gmail SMTP), including the book's details
-- **Return Handling** — Mark books as returned, automatically restoring available copy counts
+- **Book management** — add, edit, delete, and list books with title, author, ISBN, and copy counts
+- **Member management** — add, edit, delete, and list members with active/inactive status
+- **Borrow & return workflow**
+  - Select a book and member to record a new borrow
+  - Automatically decrements available copies on borrow, restores on return
+  - Due dates calculated automatically
+  - Borrow history table with status badges (Borrowed / Returned)
+- **Email confirmation** — sends a borrow confirmation email to the member (via Django's `send_mail`)
+- **Responsive UI** — Tailwind CSS (CDN) with a consistent navy/gold theme across all pages
 
 ## Tech Stack
 
-- Python / Django
-- SQLite (default database)
-- Gmail SMTP (for sending emails)
-- python-decouple (for managing environment variables/secrets)
+- **Backend:** Django
+- **Frontend:** HTML templates + Tailwind CSS (CDN)
+- **Database:** SQLite (default Django dev database)
 
 ## Project Structure
+library_lms/
+├── libraryproject/
+│   ├── library/
+│   │   ├── models.py        # Book, Member, BorrowRecord
+│   │   ├── views.py         # CRUD + borrow/return logic
+│   │   ├── forms.py         # BorrowRecordForms (ModelForm)
+│   │   ├── urls.py          # App URL routing
+│   │   └── templates/
+│   │       └── library/     # All HTML templates
+│   └── libraryproject/      # Project settings, root urls.py
+└── manage.py
 
-```
-libraryproject/
-├── library/               # Main app: models, views, forms, templates
-│   ├── models.py          # Book, Member, BorrowRecord models
-│   ├── views.py           # CRUD views + borrow/return logic + email sending
-│   ├── forms.py
-│   ├── urls.py
-│   └── templates/library/
-├── libraryproject/         # Project settings
-│   ├── settings.py
-│   ├── urls.py
-├── manage.py
-└── .env                   # Local secrets (not tracked in Git)
-```
+## Setup
 
-## Setup Instructions
-
-### 1. Clone the repository
-
-```
-git clone https://github.com/kashan2023official-beep/django-simple-lms.git
-cd django-simple-lms/libraryproject
+1. Clone the repo
+```bash
+   git clone https://github.com/kashan2023official-beep/django-simple-lms.git
+   cd django-simple-lms
 ```
 
-### 2. Create and activate a virtual environment
-
-```
-python -m venv venv
-venv\Scripts\Activate.ps1      # Windows PowerShell
-```
-
-### 3. Install dependencies
-
-```
-pip install django python-decouple
+2. Create and activate a virtual environment
+```bash
+   python -m venv venv
+   venv\Scripts\activate      # Windows
+   source venv/bin/activate   # macOS/Linux
 ```
 
-### 4. Set up environment variables
-
-Create a `.env` file in the same folder as `manage.py` with the following:
-
-```
-EMAIL_HOST_USER=your_gmail_address@gmail.com
-EMAIL_HOST_PASSWORD=your_16_character_gmail_app_password
+3. Install dependencies
+```bash
+   pip install django
 ```
 
-> Note: `EMAIL_HOST_PASSWORD` must be a Gmail **App Password**, not your regular Gmail password. Generate one from your Google Account → Security → App Passwords (requires 2-Step Verification to be enabled).
-
-### 5. Apply migrations
-
-```
-python manage.py migrate
+4. Apply migrations
+```bash
+   python manage.py migrate
 ```
 
-### 6. Run the development server
-
+5. (Optional) For local development without a real mail server, add this to `settings.py`:
+```python
+   EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ```
-python manage.py runserver
+
+6. Run the development server
+```bash
+   python manage.py runserver
 ```
 
-Visit `http://127.0.0.1:8000/` in your browser.
+7. Visit `http://127.0.0.1:8000/`
 
-## Email Notifications
+## Routes
 
-When a member borrows a book, a confirmation email is automatically sent to the email address on their member record, including:
-- Book title and author
-- Borrow date
-- A reminder to return the book on time
+| Path | Name | Description |
+|---|---|---|
+| `/` | `home` | Dashboard/landing page |
+| `/books/` | `book_list` | List all books |
+| `/books/add/` | `add_book` | Add a new book |
+| `/books/edit/<id>/` | `edit_book` | Edit a book |
+| `/books/delete/<id>/` | `delete_book` | Delete a book |
+| `/members/` | `member_list` | List all members |
+| `/members/add/` | `add_member` | Add a new member |
+| `/members/edit/<id>/` | `edit_member` | Edit a member |
+| `/members/delete/<id>/` | `delete_member` | Delete a member |
+| `/borrow/` | `borrow_book` | Borrow a book |
+| `/borrow-history/` | `borrow_list` | View borrow history |
+| `/return/<record_id>/` | `return_book` | Mark a record as returned |
 
-Emails are sent via Gmail SMTP, configured in `settings.py` using credentials pulled securely from the `.env` file.
+## Status
 
-## Notes
+Under active development as a learning project — CRUD, forms, and email are complete. Planned: migrating delete/return actions from GET links to POST forms for safety.
 
-- `.env` and `db.sqlite3` are excluded from version control via `.gitignore` — each environment should generate its own database via migrations and set its own local credentials.
-- This project was built as a learning exercise covering Django's MVT architecture, forms, the ORM, and email integration.
+## Author
+
+Built by [kashan2023official-beep](https://github.com/kashan2023official-beep) — B.Sc. Data Science student.
