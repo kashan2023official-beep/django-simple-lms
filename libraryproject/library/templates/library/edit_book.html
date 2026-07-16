@@ -1,19 +1,148 @@
-<!DOCTYPE html>
-<html>
-<head><title>Edit Book</title></head>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LMS | Edit Book</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'hms-navy': '#100E34',
+            'hms-gold': '#FFBF18',
+            'hms-blue': '#4F48EC',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+    :root { --uniform-gap: 24px; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #100E34 0%, #1d1a5f 100%);
+      background-attachment: fixed;
+      margin: 0;
+      padding-top: 120px;
+    }
+    .form-input {
+      width: 100%;
+      background-color: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 1.25rem;
+      padding: 1rem 1.25rem;
+      outline: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: #fff;
+      font-size: 0.875rem;
+      backdrop-filter: blur(5px);
+    }
+    .form-input:focus {
+      border-color: #4F48EC;
+      background-color: rgba(255, 255, 255, 0.07);
+      box-shadow: 0 0 20px rgba(79, 72, 236, 0.2);
+      transform: translateY(-1px);
+    }
+    label {
+      display: block;
+      text-transform: uppercase;
+      font-size: 0.65rem;
+      font-weight: 900;
+      letter-spacing: 0.15em;
+      color: #94a3b8;
+      margin-bottom: 0.75rem;
+      margin-left: 0.5rem;
+    }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: #100E34; }
+    ::-webkit-scrollbar-thumb {
+      background: #4F48EC;
+      border-radius: 10px;
+      border: 2px solid #100E34;
+    }
+    * { scrollbar-width: thin; scrollbar-color: #4F48EC #100E34; }
+  </style>
+</head>
 <body>
-    <h1>Edit Book</h1>
-    <form method="POST">
+
+  <nav class="fixed z-[1030] top-[var(--uniform-gap)] left-[var(--uniform-gap)] right-[var(--uniform-gap)]">
+    <div class="bg-[#100E34]/80 backdrop-blur-md rounded-[50px] px-6 py-[14px] flex items-center justify-between shadow-[0_20px_50px_rgba(79,72,236,0.25)] border border-white/10 text-white">
+      <div class="flex items-center">
+
+        <span class="font-bold text-xs tracking-widest uppercase text-slate-100">Library Management System</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="{% url 'book_list' %}" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-full px-4 py-2 text-[0.7rem] font-bold uppercase tracking-wider transition-all">
+          ← Back to Books
+        </a>
+        <span class="bg-[#FFBF18] text-[#100E34] rounded-full px-4 py-2 text-[0.7rem] font-bold uppercase tracking-wider">
+          Edit Book
+        </span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container mx-auto px-[var(--uniform-gap)] pb-20">
+
+    <header class="mb-10">
+      <div class="bg-white/5 backdrop-blur-xl rounded-[3.5rem] p-10 md:p-14 border border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.3)] relative overflow-hidden">
+        <div class="relative z-10">
+          <h1 class="text-3xl md:text-5xl font-black text-white mb-3 tracking-tight">
+            Edit <span class="text-hms-gold">Book.</span>
+          </h1>
+          <p class="text-slate-400 text-lg leading-relaxed max-w-2xl font-medium">
+            Update the details for <span class="text-white font-semibold">{{ book.title }}</span>.
+          </p>
+        </div>
+        <div class="absolute -right-20 -top-20 w-80 h-80 bg-hms-blue/10 rounded-full blur-[100px] -z-0"></div>
+      </div>
+    </header>
+
+    <section class="max-w-5xl mx-auto">
+
+      <form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 bg-white/5 p-10 md:p-16 rounded-[4rem] border border-white/10 shadow-[0_40px_80px_rgba(0,0,0,0.4)] backdrop-blur-2xl">
         {% csrf_token %}
-        <label>Title:</label><br>
-        <input type="text" name="title" value="{{ book.title }}" required><br><br>
-        <label>Author:</label><br>
-        <input type="text" name="author" value="{{ book.author }}" required><br><br>
-        <label>ISBN:</label><br>
-        <input type="text" name="isbn" value="{{ book.isbn }}" required><br><br>
-        <label>Total Copies:</label><br>
-        <input type="number" name="total_copies" value="{{ book.total_copies }}" required><br><br>
-        <button type="submit">Save Changes</button>
-    </form>
+
+        <div class="md:col-span-2 border-b border-white/5 pb-4 mb-2">
+            <h3 class="text-xl font-black text-white tracking-tight">Book Information</h3>
+        </div>
+
+        <div class="md:col-span-2 group">
+          <label for="title">Title</label>
+          <input type="text" id="title" name="title" value="{{ book.title }}" class="form-input" required>
+        </div>
+
+        <div class="group">
+          <label for="author">Author</label>
+          <input type="text" id="author" name="author" value="{{ book.author }}" class="form-input" required>
+        </div>
+
+        <div class="group">
+          <label for="isbn">ISBN</label>
+          <input type="text" id="isbn" name="isbn" value="{{ book.isbn }}" class="form-input" required>
+        </div>
+
+        <div class="group">
+          <label for="total_copies">Total Copies</label>
+          <input type="number" id="total_copies" name="total_copies" value="{{ book.total_copies }}" class="form-input" min="0" required>
+        </div>
+
+        <div class="md:col-span-2 flex flex-wrap gap-5 pt-8">
+          <button type="submit" class="bg-hms-blue text-white px-10 py-5 rounded-[1.5rem] font-black uppercase text-xs tracking-[0.2em] hover:bg-blue-600 transition-all active:scale-[0.96] flex items-center gap-3 shadow-xl shadow-hms-blue/20">
+            Save Changes
+            <svg class="w-5 h-5 text-hms-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+          </button>
+          <a href="{% url 'book_list' %}" class="bg-white/5 text-slate-400 px-10 py-5 rounded-[1.5rem] font-black uppercase text-xs tracking-[0.2em] hover:bg-white/10 hover:text-white border border-white/5 transition-all active:scale-[0.96] inline-flex items-center">
+            Cancel
+          </a>
+        </div>
+      </form>
+    </section>
+  </main>
+
 </body>
 </html>

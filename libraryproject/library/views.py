@@ -150,3 +150,9 @@ def borrow_list(request):
 
 
 
+
+def home(request):
+    return render(request, 'library/index.html')
+
+
+

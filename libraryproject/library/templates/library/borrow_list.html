@@ -1,28 +1,129 @@
-<!DOCTYPE html>
-<html>
-<head><title>Borrow History</title></head>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LMS | Borrow History</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'hms-navy': '#100E34',
+            'hms-gold': '#FFBF18',
+            'hms-blue': '#4F48EC',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+    :root { --uniform-gap: 24px; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #100E34 0%, #1d1a5f 100%);
+      background-attachment: fixed;
+      margin: 0;
+      padding-top: 120px;
+    }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: #100E34; }
+    ::-webkit-scrollbar-thumb {
+      background: #4F48EC;
+      border-radius: 10px;
+      border: 2px solid #100E34;
+    }
+    * { scrollbar-width: thin; scrollbar-color: #4F48EC #100E34; }
+  </style>
+</head>
 <body>
-    <h1>Borrow History</h1>
-    <a href="{% url 'borrow_book' %}">+ Borrow a Book</a>
-    <table border="1" cellpadding="8">
-        <tr>
-            <th>Book</th><th>Member</th><th>Borrow Date</th><th>Due Date</th><th>Return Date</th><th>Status</th><th>Action</th>
-        </tr>
-        {% for record in records %}
-        <tr>
-            <td>{{ record.book.title }}</td>
-            <td>{{ record.member.name }}</td>
-            <td>{{ record.borrow_date }}</td>
-            <td>{{ record.due_date }}</td> 
-            <td>{{ record.return_date|default:"—" }}</td>
-            <td>{% if record.returned %}Returned{% else %}Borrowed{% endif %}</td>
-            <td>
-                {% if not record.returned %}
-                <a href="{% url 'return_book' record.id %}">Mark Returned</a>
+
+  <nav class="fixed z-[1030] top-[var(--uniform-gap)] left-[var(--uniform-gap)] right-[var(--uniform-gap)]">
+    <div class="bg-[#100E34]/80 backdrop-blur-md rounded-[50px] px-6 py-[14px] flex items-center justify-between shadow-[0_20px_50px_rgba(79,72,236,0.25)] border border-white/10 text-white">
+      <div class="flex items-center">
+
+        <span class="font-bold text-xs tracking-widest uppercase text-slate-100">Library Management System</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="{% url 'home' %}" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-full px-4 py-2 text-[0.7rem] font-bold uppercase tracking-wider transition-all">
+          ← Home
+        </a>
+        <span class="bg-[#FFBF18] text-[#100E34] rounded-full px-4 py-2 text-[0.7rem] font-bold uppercase tracking-wider">
+          Borrow History
+        </span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container mx-auto px-[var(--uniform-gap)] pb-20">
+
+    <header class="mb-10">
+      <div class="bg-white/5 backdrop-blur-xl rounded-[3.5rem] p-10 md:p-14 border border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.3)] relative overflow-hidden flex items-center justify-between flex-wrap gap-6">
+        <div class="relative z-10">
+          <h1 class="text-3xl md:text-5xl font-black text-white mb-3 tracking-tight">
+            Borrow <span class="text-hms-gold">History.</span>
+          </h1>
+          <p class="text-slate-400 text-lg leading-relaxed max-w-2xl font-medium">
+            Track active and completed borrow transactions.
+          </p>
+        </div>
+        <a href="{% url 'borrow_book' %}" class="relative z-10 bg-hms-blue text-white px-8 py-4 rounded-[1.25rem] font-black uppercase text-xs tracking-[0.15em] hover:bg-blue-600 transition-all active:scale-[0.96] shadow-xl shadow-hms-blue/20 flex items-center gap-2 whitespace-nowrap">
+          + Borrow a Book
+        </a>
+        <div class="absolute -right-20 -top-20 w-80 h-80 bg-hms-blue/10 rounded-full blur-[100px] -z-0"></div>
+      </div>
+    </header>
+
+    <section class="max-w-6xl mx-auto">
+      <div class="bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 shadow-2xl overflow-hidden overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead>
+            <tr class="bg-white/5 text-[0.65rem] uppercase tracking-[0.15em] text-slate-400 font-black">
+              <th class="px-8 py-5">Book</th>
+              <th class="px-8 py-5">Member</th>
+              <th class="px-8 py-5">Borrow Date</th>
+              <th class="px-8 py-5">Due Date</th>
+              <th class="px-8 py-5">Return Date</th>
+              <th class="px-8 py-5">Status</th>
+              <th class="px-8 py-5">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for record in records %}
+            <tr class="border-t border-white/5 hover:bg-white/5 transition-colors">
+              <td class="px-8 py-5 font-semibold text-white">{{ record.book.title }}</td>
+              <td class="px-8 py-5">{{ record.member.name }}</td>
+              <td class="px-8 py-5">{{ record.borrow_date }}</td>
+              <td class="px-8 py-5">{{ record.due_date }}</td>
+              <td class="px-8 py-5">{{ record.return_date|default:"—" }}</td>
+              <td class="px-8 py-5">
+                {% if record.returned %}
+                <span class="bg-green-400/10 text-green-400 border border-green-400/20 px-3 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-wider">Returned</span>
+                {% else %}
+                <span class="bg-hms-gold/10 text-hms-gold border border-hms-gold/20 px-3 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-wider">Borrowed</span>
                 {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+              </td>
+              <td class="px-8 py-5">
+                {% if not record.returned %}
+                <a href="{% url 'return_book' record.id %}" class="text-hms-blue hover:underline font-bold">Mark Returned</a>
+                {% else %}
+                <span class="text-slate-600">—</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="px-8 py-10 text-center text-slate-500">No borrow records yet.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
 </body>
 </html>
