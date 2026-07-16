@@ -1,145 +1,96 @@
-# Library Management System (LMS)
+# Django Library Management System
 
-A simple Library Management System built with **Django**, developed as a hands-on learning project to practice Django's MTV architecture, model relationships, and CRUD operations.
+A simple Library Management System built with Django, allowing staff to manage books, members, and borrow records — with automatic email notifications sent to members when they borrow a book.
 
 ## Features
 
-- **Book Management** — Add, view, edit, and delete books with title, author, ISBN, and copy tracking (total vs. available copies)
-- **Member Management** — Add, view, edit, and delete library members with active/inactive status
-- **Borrow & Return System** — Borrow a book by selecting a book and member from dropdowns; automatically tracks available copies
-- **Due Date Tracking** — Every borrow record automatically gets a 14-day due date from the borrow date
-- **Borrow History** — Full history of all borrow records, sorted newest-first, showing borrow date, due date, return date, and status
-- **Automatic Copy Count Updates** — `available_copies` decreases when a book is borrowed and increases when returned
+- **Book Management** — Add, edit, delete, and list books (title, author, ISBN, total/available copies)
+- **Member Management** — Add, edit, delete, and list members
+- **Borrow Records** — Track which member borrowed which book, borrow date, due date, and return status
+- **Email Notifications** — When a member borrows a book, an automatic confirmation email is sent to their registered email address (via Gmail SMTP), including the book's details
+- **Return Handling** — Mark books as returned, automatically restoring available copy counts
 
 ## Tech Stack
 
-- **Backend:** Django
-- **Database:** SQLite (default, no configuration required)
-- **Frontend:** Django Templates (HTML)
+- Python / Django
+- SQLite (default database)
+- Gmail SMTP (for sending emails)
+- python-decouple (for managing environment variables/secrets)
 
 ## Project Structure
 
 ```
-library_lms/
-├── manage.py
-├── libraryproject/          # Project settings and root URL config
+libraryproject/
+├── library/               # Main app: models, views, forms, templates
+│   ├── models.py          # Book, Member, BorrowRecord models
+│   ├── views.py           # CRUD views + borrow/return logic + email sending
+│   ├── forms.py
+│   ├── urls.py
+│   └── templates/library/
+├── libraryproject/         # Project settings
 │   ├── settings.py
-│   └── urls.py
-└── library/                 # Main app
-    ├── models.py            # Book, Member, BorrowRecord
-    ├── views.py             # CRUD + borrow/return logic
-    ├── forms.py             # BorrowRecordForm (ModelForm)
-    ├── urls.py               # App-level routes
-    └── templates/
-        └── library/
-            ├── book_list.html
-            ├── add_book.html
-            ├── edit_book.html
-            ├── member_list.html
-            ├── add_member.html
-            ├── edit_member.html
-            ├── borrow_book.html
-            └── borrow_list.html
+│   ├── urls.py
+├── manage.py
+└── .env                   # Local secrets (not tracked in Git)
 ```
 
-## Models
+## Setup Instructions
 
-**Book**
-| Field | Type | Notes |
-|---|---|---|
-| title | CharField | |
-| author | CharField | |
-| isbn | CharField/IntegerField | |
-| total_copies | IntegerField | Default: 1 |
-| available_copies | IntegerField | Default: 1 |
+### 1. Clone the repository
 
-**Member**
-| Field | Type | Notes |
-|---|---|---|
-| name | CharField | |
-| email | EmailField | |
-| membership_date | DateField | Auto-set on creation |
-| is_active | BooleanField | Default: True |
-
-**BorrowRecord**
-| Field | Type | Notes |
-|---|---|---|
-| book | ForeignKey → Book | on_delete=CASCADE |
-| member | ForeignKey → Member | on_delete=CASCADE |
-| borrow_date | DateField | Auto-set on creation |
-| due_date | DateField | Auto-calculated: borrow date + 14 days |
-| return_date | DateField | Nullable, set on return |
-| returned | BooleanField | Default: False |
-
-## Setup & Installation
-
-**1. Clone the repository**
-```bash
+```
 git clone https://github.com/kashan2023official-beep/django-simple-lms.git
-cd library_lms
+cd django-simple-lms/libraryproject
 ```
 
-**2. Create and activate a virtual environment**
+### 2. Create and activate a virtual environment
 
-Windows:
-```powershell
+```
 python -m venv venv
-.\venv\Scripts\Activate.ps1
+venv\Scripts\Activate.ps1      # Windows PowerShell
 ```
 
-macOS/Linux:
-```bash
-python -m venv venv
-source venv/bin/activate
+### 3. Install dependencies
+
+```
+pip install django python-decouple
 ```
 
-**3. Install dependencies**
-```bash
-pip install django
+### 4. Set up environment variables
+
+Create a `.env` file in the same folder as `manage.py` with the following:
+
+```
+EMAIL_HOST_USER=your_gmail_address@gmail.com
+EMAIL_HOST_PASSWORD=your_16_character_gmail_app_password
 ```
 
-**4. Run migrations**
-```bash
-python manage.py makemigrations
+> Note: `EMAIL_HOST_PASSWORD` must be a Gmail **App Password**, not your regular Gmail password. Generate one from your Google Account → Security → App Passwords (requires 2-Step Verification to be enabled).
+
+### 5. Apply migrations
+
+```
 python manage.py migrate
 ```
 
-**5. Start the development server**
-```bash
+### 6. Run the development server
+
+```
 python manage.py runserver
 ```
 
-**6. Open in your browser**
-```
-http://127.0.0.1:8000/
-```
+Visit `http://127.0.0.1:8000/` in your browser.
 
-## Routes
+## Email Notifications
 
-| URL | Description |
-|---|---|
-| `/books/` | List all books |
-| `/books/add/` | Add a new book |
-| `/books/edit/<id>/` | Edit a book |
-| `/books/delete/<id>/` | Delete a book |
-| `/members/` | List all members |
-| `/members/add/` | Add a new member |
-| `/members/edit/<id>/` | Edit a member |
-| `/members/delete/<id>/` | Delete a member |
-| `/borrow/` | Borrow a book (select book + member) |
-| `/borrow-history/` | View all borrow records |
-| `/return/<record_id>/` | Mark a borrow record as returned |
+When a member borrows a book, a confirmation email is automatically sent to the email address on their member record, including:
+- Book title and author
+- Borrow date
+- A reminder to return the book on time
 
-## Planned Improvements
+Emails are sent via Gmail SMTP, configured in `settings.py` using credentials pulled securely from the `.env` file.
 
-- [ ] Search/filter books by title or author
-- [ ] Highlight or filter overdue borrows
-- [ ] Pagination for large book/member/borrow lists
-- [ ] Success/error messages using Django's messages framework
-- [ ] User authentication for staff-only access
-- [ ] Template inheritance (`base.html`) to reduce repeated HTML
-- [ ] Django Admin integration for quick data management
+## Notes
 
-## Author
-
-Built by [Your Name] as a Django learning project.
+- `.env` and `db.sqlite3` are excluded from version control via `.gitignore` — each environment should generate its own database via migrations and set its own local credentials.
+- This project was built as a learning exercise covering Django's MVT architecture, forms, the ORM, and email integration.
